@@ -56,6 +56,13 @@ var brickPadding = 10;
 var brickOffsetTop = 30;
 var brickOffsetLeft = 30;
 
+var brickCollisionAudio = new Audio("assets/sound/brick-collision.mp3");
+var lostScoreAudio = new Audio("assets/sound/lost-score.mp3");
+var victoryAudio = new Audio("assets/sound/victory.mp3");
+
+
+var gameStatus = "playing";
+
 //loop to create brick rows
 var bricks = [];
 for(c=0; c<brickColumnCount; c++) {
@@ -112,44 +119,50 @@ function drawScore() {
 }
 
 function draw() {
+	
+	if(gameStatus == "playing"){
+	    ctx.clearRect(0, 0, canvas.width, canvas.height);
+		drawBall();
+		drawPaddle();
+		drawBricks();
+		x += dx;
+	    y += dy;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-	drawBall();
-	drawPaddle();
-	drawBricks();
-	x += dx;
-    y += dy;
+	    if(y - radius <= 0){
+	    	dy = dy * -1;
+	    } else  if(y >= canvas.height - radius){
+	    	if(x > paddleX && x < paddleX + paddleWidth) {
+	            dy = -dy;
+	        } else {
+	        	lives--;
+	        	if(lives <= 0){
+	     			alert("GAME OVER!");
+	            	document.location.reload();
+	        	} else {
+	        		lostScoreAudio.play();
+	        		resetBallPosition();
+	        	}
+	     	}
+	    }
 
-    if(y - radius <= 0){
-    	dy = dy * -1;
-    } else  if(y >= canvas.height - radius){
-    	if(x > paddleX && x < paddleX + paddleWidth) {
-            dy = -dy;
-        } else {
-        	lives--;
-        	if(lives <= 0){
-     			alert("GAME OVER!");
-            	document.location.reload();
-        	} else {
-        		resetBallPosition();
-        	}
-     	}
-    }
+	    if(x - radius <=0 || x + radius >= canvas.width){
+	    	dx = dx * -1;
+	    }
 
-    if(x - radius <=0 || x + radius >= canvas.width){
-    	dx = dx * -1;
-    }
+	    if(rightPressed && paddleX < canvas.width-paddleWidth) {
+	    	paddleX += 7;
+		} else if(leftPressed && paddleX > 0) {
+		    paddleX -= 7;
+		}
 
-    if(rightPressed && paddleX < canvas.width-paddleWidth) {
-    	paddleX += 7;
-	} else if(leftPressed && paddleX > 0) {
-	    paddleX -= 7;
+		collisionDetection();
+		drawScore();
+		drawLives();
 	}
-
-	collisionDetection();
-	drawScore();
-	drawLives();
+	
 	requestAnimationFrame(draw);
+
+
 }
 
 draw();
@@ -162,15 +175,17 @@ function keyDownHandler(e) {
         rightPressed = true;
     } else if(e.keyCode == 37) {
         leftPressed = true;
-    }
-}
+    } }
 
 function keyUpHandler(e) {
     if(e.keyCode == 39) {
         rightPressed = false;
     } else if(e.keyCode == 37) {
         leftPressed = false;
+    } else if(e.keyCode == 32){
+    	toggleGameStatus();
     }
+
 } 
 
 function mouseMoveHandler(e) {
@@ -188,8 +203,11 @@ function collisionDetection() {
                 dy = -dy;
                 b.status = 0;
                 score++;
+
+                brickCollisionAudio.play();
                 
                 if(score == brickRowCount*brickColumnCount) {
+                		victory.play();
                         alert("YOU WIN, CONGRATULATIONS!");
                         document.location.reload();
                 }
@@ -205,7 +223,14 @@ function resetBallPosition(){
 	x  = initialX;
 }
 
-
+function toggleGameStatus(){
+	if(gameStatus == "paused"){
+		gameStatus = "playing";
+	} else if(gameStatus = "playing"){
+		gameStatus = "paused";
+	}
+	
+}
 
 </script>
 
