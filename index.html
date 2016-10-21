@@ -5,7 +5,7 @@
     <title>Gamedev Canvas Workshop</title>
     <style>
     	* { padding: 0; margin: 0; }
-    	canvas { background: #eee; display: block; margin: 0 auto; }
+    	canvas { background: #eee; display: block; margin: 0 auto; background-image: url("assets/img/background.jpg")}
     </style>
 </head>
 <body>
@@ -16,6 +16,7 @@
 //canvas definitions
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
+
 
 var score = 0;
 var lives = 3;
@@ -119,7 +120,7 @@ function drawScore() {
 }
 
 function draw() {
-	
+
 	if(gameStatus == "playing"){
 	    ctx.clearRect(0, 0, canvas.width, canvas.height);
 		drawBall();
@@ -166,6 +167,7 @@ function draw() {
 }
 
 draw();
+
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("mousemove", mouseMoveHandler, false);
@@ -207,7 +209,7 @@ function collisionDetection() {
                 brickCollisionAudio.play();
                 
                 if(score == brickRowCount*brickColumnCount) {
-                		victory.play();
+                		victoryAudio.play();
                         alert("YOU WIN, CONGRATULATIONS!");
                         document.location.reload();
                 }
@@ -231,7 +233,6 @@ function toggleGameStatus(){
 	}
 	
 }
-
 </script>
 
 </body>
