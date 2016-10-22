@@ -109,6 +109,11 @@ function drawPaddle() {
     ctx.fillStyle = "#0095DD";
     ctx.fill();
     ctx.closePath();
+    ctx.beginPath();
+    ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth/2, paddleHeight);
+    ctx.fillStyle = "red";
+    ctx.fill();
+    ctx.closePath();
 }
 
 function drawLives() {
@@ -217,7 +222,6 @@ function keyUpHandler(e) {
     	if(gameStatus != "lost")
     	toggleGameStatus();
     }
-
 } 
 
 function mouseMoveHandler(e) {
