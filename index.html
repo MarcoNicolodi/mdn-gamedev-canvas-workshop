@@ -11,15 +11,15 @@
     	canvas { 
     		background: #eee; 
     		display: block; 
-    		margin: 0 auto; 
+    		margin-left: 400px; 
     		background-image: url("assets/img/background.jpg")
     	}
     	div.controls {
     		position: absolute;
     		background-color: #85C6E6;
-    		box-shadow: 2px 2px #0095DD;
+    		/*box-shadow: 2px 2px #0095DD;*/
     		width: 400px;
-    		height: 230px;
+    		height: 320px;
     		float: left;
     	}
 
@@ -34,6 +34,7 @@
 	<p> Use the <strong> arrow keys </strong> to move the paddle </p>
 	<p> Press <strong> space bar </strong> to toggle pause </p>
 	<p> You can also control the paddle with the <strong> mouse cursor </strong> </p>
+	<p> The obstacle only fucks you up if the ball is going <strong>up</strong>, not <strong>down</strong> </p>
 </div>
 <canvas id="myCanvas" width="480" height="320"></canvas>
 
@@ -66,7 +67,7 @@ var y = initialY;
 
 //bottom paddle definitions
 var paddleHeight = 10;
-var paddleWidth = 75;
+var paddleWidth = 90;
 var paddleX = (canvas.width-paddleWidth)/2;
 
 //stores the state of key pressings
@@ -97,6 +98,43 @@ for(c=0; c<brickColumnCount; c++) {
         bricks[c][r] = { x: 0, y: 0, status: 1 };
     }
 }
+
+var obstacle = {
+	initX: canvas.width/2,
+	initY: canvas.height/2,
+	dx:    -2,
+	width: paddleWidth,
+	height: paddleHeight,
+	x: canvas.height/2,
+	y: canvas.width/3,
+	invertDx: function(){
+		this.dx = this.dx * -1;
+	},
+	collidedWithCanvas: function(){
+		if(this.x <= 0 || this.x + this.width >= canvas.width)
+			return true;
+
+		return false;
+	},
+	move: function (){
+		this.x += this.dx
+	},
+	ballCollisionDetection: function(){
+		if(dy < 0 && this.x <= x && this.x+this.width  >= x && this.y + this.height >= y - radius && this.y <= y + radius)
+			return true;
+
+		return false;
+	},
+	proccessBallCollisionDetection(){
+		if(this.ballCollisionDetection()){
+			lives--;
+			lostScoreAudioClone = lostScoreAudio.cloneNode()
+			resetBallPosition();
+			lostScoreAudioClone.play();
+		}
+	}    
+}
+
 
 function drawBricks() {
     for(c=0; c<brickColumnCount; c++) {
@@ -176,6 +214,7 @@ function draw() {
 		drawBall();
 		drawPaddle();
 		drawBricks();
+		drawObstacle();
 		x += dx;
 	    y += dy;
 
@@ -215,14 +254,13 @@ function draw() {
 		    paddleX -= 7;
 		}
 
+		obstacle.proccessBallCollisionDetection();
 		collisionDetection();
 		drawScore();
 		drawLives();
 	}
 	
 	requestAnimationFrame(draw);
-	
-
 }
 
 draw();
@@ -265,6 +303,7 @@ function collisionDetection() {
                 b.status = 0;
                 score++;
 
+                //got to clone the node to play more than one collision audio simultaneously
             	var clonedAudio = brickCollisionAudio.cloneNode();
                 clonedAudio.play();
                 
@@ -278,6 +317,20 @@ function collisionDetection() {
     }
 }
 
+
+function drawObstacle(){
+
+	obstacle.move();
+	if(obstacle.collidedWithCanvas())
+		obstacle.invertDx();
+
+	ctx.beginPath();
+    ctx.rect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    ctx.fillStyle = "#0095DD";
+    ctx.fill();
+    ctx.closePath();    
+}
+
 function resetBallPosition(){
 	dy = initialDy;
 	dx = initialDx;
@@ -287,7 +340,7 @@ function resetBallPosition(){
 
 function toggleGameStatus(){
 	if(gameStatus == "paused"){
-		gameStatus = "playing";
+		gameStatus = "playing";this
 	} else if(gameStatus = "playing"){
 		gameStatus = "paused";
 	}	
