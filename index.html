@@ -4,12 +4,37 @@
     <meta charset="utf-8" />
     <title>Gamedev Canvas Workshop</title>
     <style>
-    	* { padding: 0; margin: 0; }
-    	canvas { background: #eee; display: block; margin: 0 auto; background-image: url("assets/img/background.jpg")}
+    	body { 
+    		padding: 0;
+    		margin: 0; 
+    	}
+    	canvas { 
+    		background: #eee; 
+    		display: block; 
+    		margin: 0 auto; 
+    		background-image: url("assets/img/background.jpg")
+    	}
+    	div.controls {
+    		position: absolute;
+    		background-color: #85C6E6;
+    		box-shadow: 2px 2px #0095DD;
+    		width: 400px;
+    		height: 230px;
+    		float: left;
+    	}
+
+    	div.controls p {
+    		font-family: geneva;
+    	}
+
     </style>
 </head>
 <body>
-
+<div class="controls">
+	<p> Use the <strong> arrow keys </strong> to move the paddle </p>
+	<p> Press <strong> space bar </strong> to toggle pause </p>
+	<p> You can also control the paddle with the <strong> mouse cursor </strong> </p>
+</div>
 <canvas id="myCanvas" width="480" height="320"></canvas>
 
 <script>
@@ -240,7 +265,8 @@ function collisionDetection() {
                 b.status = 0;
                 score++;
 
-                brickCollisionAudio.play();
+            	var clonedAudio = brickCollisionAudio.cloneNode();
+                clonedAudio.play();
                 
                 if(score == brickRowCount*brickColumnCount) {
                 		victoryAudio.play();
